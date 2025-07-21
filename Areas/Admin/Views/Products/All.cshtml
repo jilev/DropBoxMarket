@@ -1,0 +1,22 @@
+﻿@model IEnumerable<DropBoxMarket.Models.Product>
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    ViewData["Title"] = "All Products";
+}
+
+<h2>All Products</h2>
+
+@foreach (var product in Model)
+{
+    <div class="border p-3 mb-2">
+        <h4>@product.Title</h4>
+        <p>Price: @product.Price.ToString("C")</p>
+        <p>Category: @product.Category?.Name</p>
+        <form method="post" asp-controller="Cart" asp-action="AddToCart">
+            <input type="hidden" name="productId" value="@product.Id" />
+            <button type="submit" class="btn btn-primary">Add to Cart</button>
+        </form>
+    </div>
+}

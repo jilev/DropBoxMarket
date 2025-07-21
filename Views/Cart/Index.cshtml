@@ -1,0 +1,49 @@
+﻿@model List<DropBoxMarket.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Your Cart";
+}
+
+<h2 class="mb-4">Your Cart</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Your cart is empty.</div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Product</th>
+                <th class="text-center">Qty</th>
+                <th class="text-end">Price</th>
+                <th class="text-end">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td class="text-center">@item.Quantity</td>
+                    <td class="text-end">@item.Price.ToString("C")</td>
+                    <td class="text-end">@((item.Price * item.Quantity).ToString("C"))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between">
+        <a asp-action="Clear" class="btn btn-outline-danger">🗑 Clear Cart</a>
+        <a asp-controller="Order" asp-action="Checkout" class="btn btn-success">✅ Proceed to Checkout</a>
+    </div>
+}

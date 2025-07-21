@@ -1,0 +1,23 @@
+# .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.dbmdl
+*.log
+*.vspscc
+*.vssscc
+*.userprefs
+*.DS_Store
+
+# Build
+build/
+publish/
+
+# OS
+Thumbs.db
+ehthumbs.db
+.DS_Store
+
+ECHO is on.

@@ -1,0 +1,19 @@
+﻿@model DropBoxMarket.Models.Product
+
+@{
+    ViewData["Title"] = "Delete Product";
+}
+
+<h2>Are you sure you want to delete this product?</h2>
+
+<div class="mb-3">
+    <strong>Title:</strong> @Model.Title <br />
+    <strong>Category:</strong> @Model.Category?.Name <br />
+    <strong>Price:</strong> @Model.Price.ToString("C") <br />
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

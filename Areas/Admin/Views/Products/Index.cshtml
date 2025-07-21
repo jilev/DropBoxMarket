@@ -1,0 +1,36 @@
+﻿@model IEnumerable<DropBoxMarket.Models.Product>
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Products";
+}
+
+<h2 class="mb-4">Products</h2>
+
+<a asp-area="Admin" asp-controller="Products" asp-action="Create" class="btn btn-primary mb-3">Add New</a>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Title</td>
+                <td>@product.Price.ToString("C")</td>
+                <td>@product.Category?.Name</td>
+                <td>
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="btn btn-info btn-sm">Details</a>
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
