@@ -12,10 +12,12 @@ namespace DropBoxMarket.Areas.Admin.Controllers
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public ProductsController(ApplicationDbContext context)
+        public ProductsController(ApplicationDbContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
 
         public IActionResult Index()
@@ -31,7 +33,7 @@ namespace DropBoxMarket.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Product product)
+        public async Task<IActionResult> Create(Product product, IFormFile? imageFile)
         {
             if (!ModelState.IsValid)
             {
@@ -39,8 +41,22 @@ namespace DropBoxMarket.Areas.Admin.Controllers
                 return View(product);
             }
 
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "images");
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                product.ImageUrl = "/images/" + uniqueFileName;
+            }
+
             _context.Products.Add(product);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             TempData["Message"] = "Product created successfully!";
             return RedirectToAction(nameof(Index));
@@ -56,7 +72,7 @@ namespace DropBoxMarket.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Product product)
+        public async Task<IActionResult> Edit(Product product, IFormFile? imageFile)
         {
             if (!ModelState.IsValid)
             {
@@ -64,8 +80,23 @@ namespace DropBoxMarket.Areas.Admin.Controllers
                 return View(product);
             }
 
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "images");
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                product.ImageUrl = "/images/" + uniqueFileName;
+            }
+
             _context.Products.Update(product);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
             TempData["Message"] = "Product updated successfully!";
             return RedirectToAction(nameof(Index));
         }
@@ -78,13 +109,14 @@ namespace DropBoxMarket.Areas.Admin.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = _context.Products.Find(id);
+            var product = await _context.Products.FindAsync(id);
             if (product == null) return NotFound();
 
             _context.Products.Remove(product);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
             TempData["Message"] = "Product deleted.";
             return RedirectToAction(nameof(Index));
         }
