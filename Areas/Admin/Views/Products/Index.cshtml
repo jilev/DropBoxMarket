@@ -1,21 +1,23 @@
 ﻿@model IEnumerable<DropBoxMarket.Models.Product>
-
 @{
-    ViewData["Title"] = "Product List";
+    ViewData["Title"] = "Products";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2>Products</h2>
+<h1>Products</h1>
 
-<a asp-action="Create" class="btn btn-success mb-3">Add New Product</a>
+<p>
+    <a asp-area="Admin" asp-controller="Products" asp-action="Create" class="btn btn-success">Add New Product</a>
+</p>
 
 <table class="table table-bordered table-striped">
-    <thead>
+    <thead class="table-dark">
         <tr>
             <th>Image</th>
             <th>Title</th>
             <th>Price</th>
             <th>Category</th>
-            <th>Actions</th>
+            <th style="width:180px;">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -25,15 +27,16 @@
                 <td>
                     @if (!string.IsNullOrEmpty(product.ImageUrl))
                     {
-                        <img src="@product.ImageUrl" alt="Image" width="60" />
+                        <img src="@product.ImageUrl" alt="Product Image" style="width:60px; height:auto;" />
                     }
                 </td>
                 <td>@product.Title</td>
                 <td>@product.Price.ToString("C")</td>
                 <td>@product.Category?.Name</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-warning btn-sm">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger btn-sm">Delete</a>
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id" class="btn btn-primary btn-sm">Edit</a>
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="btn btn-info btn-sm">Details</a>
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger btn-sm">Delete</a>
                 </td>
             </tr>
         }
