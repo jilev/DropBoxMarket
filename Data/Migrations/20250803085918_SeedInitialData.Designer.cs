@@ -4,6 +4,7 @@ using DropBoxMarket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DropBoxMarket.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250803085918_SeedInitialData")]
+    partial class SeedInitialData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,28 +158,28 @@ namespace DropBoxMarket.Data.Migrations
                         {
                             Id = 1,
                             CategoryId = 1,
-                            Description = "Latest model with advanced features",
+                            Description = "Latest model smartphone with 5G",
                             ImageUrl = "/images/smartphone.jpg",
-                            Price = 699.99m,
+                            Price = 899.99m,
                             Title = "Smartphone"
                         },
                         new
                         {
                             Id = 2,
                             CategoryId = 2,
-                            Description = "High power vacuum cleaner",
-                            ImageUrl = "/images/vacuum.jpg",
-                            Price = 199.99m,
-                            Title = "Vacuum Cleaner"
+                            Description = "High-quality coffee maker for your home",
+                            ImageUrl = "/images/coffeemaker.jpg",
+                            Price = 120.50m,
+                            Title = "Coffee Maker"
                         },
                         new
                         {
                             Id = 3,
                             CategoryId = 3,
-                            Description = "Cotton T-Shirt for everyday use",
-                            ImageUrl = "/images/tshirt.jpg",
-                            Price = 19.99m,
-                            Title = "T-Shirt"
+                            Description = "Stylish winter jacket",
+                            ImageUrl = "/images/jacket.jpg",
+                            Price = 79.99m,
+                            Title = "Men's Jacket"
                         });
                 });
 

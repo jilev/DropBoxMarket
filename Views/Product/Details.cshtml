@@ -4,14 +4,30 @@
     ViewData["Title"] = "Product Details";
 }
 
-<h2>@Model.Title</h2>
+<h2 class="mb-4">@Model.Title</h2>
 
-<div class="card mt-3">
-    <div class="card-body">
-        <h5 class="card-title">@Model.Title</h5>
-        <p class="card-text">@Model.Description</p>
-        <p><strong>Price:</strong> @Model.Price.ToString("C")</p>
+<div class="row">
+    <div class="col-md-6">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" class="img-fluid rounded shadow-sm mb-3" alt="@Model.Title" />
+        }
+        else
+        {
+            <img src="/images/no-image.png" class="img-fluid rounded shadow-sm mb-3" alt="No Image" />
+        }
+    </div>
+    <div class="col-md-6">
         <p><strong>Category:</strong> @Model.Category?.Name</p>
-        <a asp-action="All" class="btn btn-secondary mt-2">Back to Products</a>
+        <p><strong>Price:</strong> @Model.Price.ToString("C")</p>
+        <p><strong>Description:</strong></p>
+        <p>@Model.Description</p>
+
+        <form method="post" asp-controller="Cart" asp-action="AddToCart">
+            <input type="hidden" name="productId" value="@Model.Id" />
+            <button type="submit" class="btn btn-primary btn-lg">Add to Cart 🛒</button>
+        </form>
+
+        <a asp-action="All" class="btn btn-secondary mt-3">Back to Products</a>
     </div>
 </div>

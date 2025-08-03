@@ -18,6 +18,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
+builder.Services.AddSignalR();
+
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -48,6 +50,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -92,4 +95,14 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error/500");
+    app.UseStatusCodePagesWithReExecute("/Error/{0}");
+}
+else
+{
+    app.UseStatusCodePagesWithReExecute("/Error/{0}");
+}
+app.MapHub<DropBoxMarket.Hubs.OrderHub>("/orderHub");
 app.Run();

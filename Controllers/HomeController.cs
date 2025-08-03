@@ -30,5 +30,11 @@ namespace DropBoxMarket.Controllers
         }
 
         public IActionResult About() => View();
+
+        //public IActionResult TestError()
+        //{
+        //    throw new Exception("Test 500 error");
+        //}
+
     }
 }

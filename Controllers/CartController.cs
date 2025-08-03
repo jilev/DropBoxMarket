@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using DropBoxMarket.Data;
 using DropBoxMarket.Models;
-using DropBoxMarket.Extensions; // Увери се, че това пространство имена е налично за GetObject/SetObject
+using DropBoxMarket.Extensions; 
 
 public class CartController : Controller
 {

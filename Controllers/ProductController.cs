@@ -54,7 +54,6 @@ public class ProductController : Controller
         return RedirectToAction("All");
     }
 
-
     public IActionResult Delete(int id)
     {
         var product = _context.Products
@@ -63,6 +62,13 @@ public class ProductController : Controller
 
         if (product == null)
             return NotFound();
+
+        ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
+        {
+            ("Home", Url.Action("Index", "Home")),
+            ("Products", Url.Action("All", "Product")),
+            ("Delete", null)
+        };
 
         return View(product);
     }
@@ -91,8 +97,16 @@ public class ProductController : Controller
         return RedirectToAction("All");
     }
 
-    public IActionResult All(int? categoryId)
+    public IActionResult All(int? categoryId, string searchTerm, int page = 1)
     {
+        ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
+        {
+            ("Home", Url.Action("Index", "Home")),
+            ("Products", null)
+        };
+
+        int pageSize = 6;
+
         var productsQuery = _context.Products
             .Include(p => p.Category)
             .AsQueryable();
@@ -102,19 +116,69 @@ public class ProductController : Controller
             productsQuery = productsQuery.Where(p => p.CategoryId == categoryId.Value);
         }
 
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            productsQuery = productsQuery.Where(p =>
+                p.Title.Contains(searchTerm) ||
+                p.Description.Contains(searchTerm));
+        }
+
         ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
         ViewBag.SelectedCategory = categoryId;
+        ViewBag.SearchTerm = searchTerm;
 
-        var products = productsQuery.ToList();
+        int totalItems = productsQuery.Count();
+        var products = productsQuery
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        var recommendedProducts = _context.Products
+            .Include(p => p.Category)
+            .Where(p => !products.Select(x => x.Id).Contains(p.Id))
+            .OrderBy(r => Guid.NewGuid())
+            .Take(4)
+            .ToList();
+
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+        ViewBag.RecommendedProducts = recommendedProducts;
+
         return View(products);
     }
+
     public IActionResult Edit(int id)
     {
         var product = _context.Products.Find(id);
         if (product == null) return NotFound();
 
+        ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
+        {
+            ("Home", Url.Action("Index", "Home")),
+            ("Products", Url.Action("All", "Product")),
+            ("Edit", null)
+        };
+
         ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
         return View(product);
     }
 
+    public IActionResult Details(int id)
+    {
+        var product = _context.Products
+            .Include(p => p.Category)
+            .FirstOrDefault(p => p.Id == id);
+
+        if (product == null)
+            return NotFound();
+
+        ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
+        {
+            ("Home", Url.Action("Index", "Home")),
+            ("Products", Url.Action("All", "Product")),
+            (product.Title, null)
+        };
+
+        return View(product);
+    }
 }

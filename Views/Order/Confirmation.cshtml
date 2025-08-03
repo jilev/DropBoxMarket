@@ -1,9 +1,19 @@
-﻿@{
+﻿@model DropBoxMarket.Models.ViewModels.ConfirmationViewModel
+
+@{
     ViewData["Title"] = "Order Confirmation";
 }
 
-<div class="text-center mt-5">
-    <h2 class="text-success">🎉 Thank you for your order!</h2>
-    <p>We have received your order and will process it shortly.</p>
-    <a class="btn btn-primary mt-3" asp-controller="Product" asp-action="All">Continue Shopping</a>
-</div>
+<p>Thank you for your order, @Model.FullName.</p>
+
+<ul>
+    @foreach (var item in Model.Items)
+    {
+        <li>@item.ProductName - @item.Quantity x @item.Price.ToString("C")</li>
+    }
+</ul>
+
+<p><strong>Total Price:</strong> @Model.TotalPrice.ToString("C")</p>
+<p><strong>Total: @Model.TotalPrice.ToString("C")</strong></p>
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-primary">Back to Home</a>

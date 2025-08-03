@@ -15,6 +15,8 @@
 }
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken() 
+
     <input type="hidden" asp-for="Id" />
 
     <div class="mb-3">
@@ -48,6 +50,10 @@
         @if (!string.IsNullOrEmpty(Model.ImageUrl))
         {
             <img src="@Model.ImageUrl" alt="Product Image" class="img-thumbnail mb-2" style="max-height: 150px;" />
+        }
+        else
+        {
+            <p class="text-muted">No image uploaded</p>
         }
     </div>
 

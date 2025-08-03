@@ -72,6 +72,26 @@
     </header>
 
     <div class="container mt-4">
+        @if (ViewData["Breadcrumbs"] != null)
+        {
+            var breadcrumbs = (List<(string Text, string Url)>)ViewData["Breadcrumbs"];
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    @foreach (var crumb in breadcrumbs)
+                    {
+                        if (!string.IsNullOrEmpty(crumb.Url))
+                        {
+                            <li class="breadcrumb-item"><a href="@crumb.Url">@crumb.Text</a></li>
+                        }
+                        else
+                        {
+                            <li class="breadcrumb-item active" aria-current="page">@crumb.Text</li>
+                        }
+                    }
+                </ol>
+            </nav>
+        }
+
         <main role="main" class="pb-3">
             @if (TempData["Message"] != null)
             {

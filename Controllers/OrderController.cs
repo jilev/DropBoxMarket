@@ -6,17 +6,22 @@ using DropBoxMarket.Data;
 using DropBoxMarket.Models;
 using DropBoxMarket.Models.ViewModels;
 using DropBoxMarket.Extensions;
+using Microsoft.AspNetCore.SignalR;
+using DropBoxMarket.Hubs;
+using System.Linq;
 
 [Authorize]
 public class OrderController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly IHubContext<OrderHub> _hubContext;
 
-    public OrderController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+    public OrderController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IHubContext<OrderHub> hubContext)
     {
         _context = context;
         _userManager = userManager;
+        _hubContext = hubContext;
     }
 
     [HttpGet]
@@ -29,11 +34,11 @@ public class OrderController : Controller
             return RedirectToAction("Index", "Cart");
         }
 
-        var model = new CheckoutViewModel();
-        return View(model);
+        return View(new CheckoutViewModel());
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Checkout(CheckoutViewModel model)
     {
         if (!ModelState.IsValid)
@@ -67,9 +72,17 @@ public class OrderController : Controller
         _context.Orders.Add(order);
         await _context.SaveChangesAsync();
 
+        await _hubContext.Clients.Group("Admins").SendAsync("ReceiveOrderNotification", new
+        {
+            Message = $"Нова поръчка от {model.FullName}",
+            OrderId = order.Id,
+            Date = order.OrderDate.ToString("dd.MM.yyyy HH:mm")
+        });
+
         HttpContext.Session.Remove("cart");
         TempData["Message"] = "Order placed successfully!";
-        return RedirectToAction("Confirmation");
+
+        return RedirectToAction("Confirmation", new { orderId = order.Id });
     }
 
     public IActionResult MyOrders()
@@ -84,9 +97,30 @@ public class OrderController : Controller
 
         return View(orders);
     }
-    public IActionResult Confirmation()
-    {
-        return View();
-    }
 
+    public IActionResult Confirmation(int orderId)
+    {
+        var order = _context.Orders
+            .Include(o => o.Items)
+            .ThenInclude(i => i.Product)
+            .FirstOrDefault(o => o.Id == orderId);
+
+        if (order == null)
+            return NotFound();
+
+        var model = new ConfirmationViewModel
+        {
+            FullName = order.FullName,
+            OrderDate = order.OrderDate,
+            TotalPrice = order.Items.Sum(i => i.Quantity * i.Product.Price),
+            Items = order.Items.Select(i => new OrderItemViewModel
+            {
+                ProductName = i.Product.Title,
+                Quantity = i.Quantity,
+                Price = i.Product.Price
+            }).ToList()
+        };
+
+        return View(model);
+    }
 }
