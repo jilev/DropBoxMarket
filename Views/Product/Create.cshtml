@@ -15,23 +15,24 @@
 }
 
 <form asp-action="Create" method="post" enctype="multipart/form-data">
-    @Html.AntiForgeryToken() 
+    @Html.AntiForgeryToken()
 
+    ```
     <div class="mb-3">
         <label asp-for="Title" class="form-label">Product Title</label>
-        <input asp-for="Title" class="form-control" />
+        <input asp-for="Title" class="form-control" placeholder="Enter product title" />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Description" class="form-label">Description</label>
-        <textarea asp-for="Description" class="form-control"></textarea>
+        <textarea asp-for="Description" class="form-control" placeholder="Enter product description"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Price" class="form-label">Price</label>
-        <input asp-for="Price" class="form-control" />
+        <input asp-for="Price" class="form-control" placeholder="0.00" />
         <span asp-validation-for="Price" class="text-danger"></span>
     </div>
 
@@ -50,6 +51,9 @@
 
     <button type="submit" class="btn btn-success">Add product</button>
     <a asp-action="Index" class="btn btn-secondary ms-2">Back</a>
+
+    ```
+
 </form>
 
 @section Scripts {
