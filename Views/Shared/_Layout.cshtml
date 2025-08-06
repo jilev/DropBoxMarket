@@ -12,9 +12,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - DropBoxMarket App</title>
 
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DropBoxMarket.styles.css" asp-append-version="true" />
+
 
 </head>
 <body>
@@ -27,6 +29,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
+                
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         @if (User.IsInRole("Administrator"))
@@ -60,7 +63,7 @@
                                 Categories
                                 @if (ViewBag.CategoryCount != null && (int)ViewBag.CategoryCount > 0)
                                 {
-                                    <span class="badge bg-info">@ViewBag.CategoryCount</span>
+                                    <span class="badge bg-info text-dark">@ViewBag.CategoryCount</span>
                                 }
                             </a>
                         </li>
@@ -72,14 +75,12 @@
                         </li>
                     </ul>
 
-                    
                     <partial name="_LoginPartial" />
-
-                    
-
                 </div>
             </div>
         </nav>
+
+
     </header>
 
     <div class="container mt-4">
@@ -103,7 +104,6 @@
             </nav>
         }
 
-       
         <main role="main" class="pb-3">
             @if (TempData["Message"] != null)
             {
@@ -132,6 +132,5 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
 </html>

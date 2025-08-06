@@ -8,7 +8,6 @@ public class ProductController : Controller
 {
     private readonly ApplicationDbContext _context;
 
-```
 public ProductController(ApplicationDbContext context)
     {
         _context = context;
@@ -200,6 +199,5 @@ public ProductController(ApplicationDbContext context)
         return View(product);
     }
 
-```
 
 }
