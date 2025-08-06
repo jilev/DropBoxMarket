@@ -22,6 +22,7 @@
             </select>
         </div>
 
+        
         <div class="col-md-4">
             <label for="searchTerm" class="form-label">Search Products</label>
             <input type="text" id="searchTerm" name="searchTerm" value="@ViewBag.SearchTerm" class="form-control" placeholder="Search..." />
@@ -31,6 +32,9 @@
             <button type="submit" class="btn btn-primary">Apply</button>
         </div>
     </div>
+
+    
+
 </form>
 
 <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -47,26 +51,35 @@
                     <p class="card-text mb-1">Price: <strong>@product.Price.ToString("C")</strong></p>
                     <p class="card-text text-muted mb-2">Category: @product.Category?.Name</p>
 
+                    ```
                     <form method="post" asp-controller="Cart" asp-action="AddToCart" class="mb-2">
                         <input type="hidden" name="productId" value="@product.Id" />
-                        <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </button>
                     </form>
 
                     <a asp-action="Details" asp-controller="Product" asp-route-id="@product.Id"
-                       class="btn btn-outline-info w-100 mb-2">Details</a>
+                       class="btn btn-outline-info w-100 mb-2">
+                        <i class="bi bi-info-circle"></i> Details
+                    </a>
 
                     <div class="d-flex gap-2">
-                        <a asp-action="Edit" asp-controller="Product" asp-route-id="@product.Id" class="btn btn-warning w-50">Edit</a>
+                        <a asp-action="Edit" asp-controller="Product" asp-route-id="@product.Id" class="btn btn-warning w-50">
+                            <i class="bi bi-pencil-square"></i> Edit
+                        </a>
                         <a asp-action="Delete" asp-controller="Product" asp-route-id="@product.Id"
                            class="btn btn-danger w-50"
                            onclick="return confirm('Are you sure you want to delete this product?');">
-                            Delete
+                            <i class="bi bi-trash"></i> Delete
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     }
+
+
 </div>
 
 @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
@@ -92,15 +105,17 @@
                 </li>
             }
 
-            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                <a class="page-link"
-                   asp-action="All"
-                   asp-route-categoryId="@ViewBag.SelectedCategory"
-                   asp-route-searchTerm="@ViewBag.SearchTerm"
-                   asp-route-page="@(ViewBag.CurrentPage + 1)">Next</a>
-            </li>
-        </ul>
-    </nav>
+        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+            <a class="page-link"
+               asp-action="All"
+               asp-route-categoryId="@ViewBag.SelectedCategory"
+               asp-route-searchTerm="@ViewBag.SearchTerm"
+               asp-route-page="@(ViewBag.CurrentPage + 1)">Next</a>
+        </li>
+    </ul>
+</nav>
+
+
 }
 
 @if (ViewBag.RecommendedProducts != null && ((List<DropBoxMarket.Models.Product>)ViewBag.RecommendedProducts).Any())
@@ -121,16 +136,23 @@
                         <p class="card-text mb-1">Price: <strong>@rec.Price.ToString("C")</strong></p>
                         <p class="card-text text-muted mb-2">Category: @rec.Category?.Name</p>
 
+                        ```
                         <a asp-action="Details" asp-controller="Product" asp-route-id="@rec.Id"
-                           class="btn btn-outline-info w-100 mb-2">Details</a>
+                           class="btn btn-outline-info w-100 mb-2">
+                            <i class="bi bi-info-circle"></i> Details
+                        </a>
 
                         <form method="post" asp-controller="Cart" asp-action="AddToCart">
                             <input type="hidden" name="productId" value="@rec.Id" />
-                            <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-cart-plus"></i> Add to Cart
+                            </button>
                         </form>
                     </div>
                 </div>
             </div>
         }
-    </div>
+</div>
+
+
 }
