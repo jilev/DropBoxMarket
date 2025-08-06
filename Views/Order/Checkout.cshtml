@@ -9,25 +9,31 @@
 <form asp-action="Checkout" method="post">
     @Html.AntiForgeryToken()
 
+    ```
     <div class="mb-3">
         <label asp-for="FullName" class="form-label"></label>
-        <input asp-for="FullName" class="form-control" />
+        <input asp-for="FullName" class="form-control" placeholder="Enter your full name" />
         <span asp-validation-for="FullName" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Phone" class="form-label"></label>
-        <input asp-for="Phone" class="form-control" />
+        <input asp-for="Phone" class="form-control" placeholder="Enter your phone number" />
         <span asp-validation-for="Phone" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Address" class="form-label"></label>
-        <textarea asp-for="Address" class="form-control"></textarea>
+        <textarea asp-for="Address" class="form-control" placeholder="Enter your shipping address"></textarea>
         <span asp-validation-for="Address" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-success">Place Order</button>
+    <button type="submit" class="btn btn-success">
+        <i class="bi bi-bag-check"></i> Place Order
+    </button>
+
+    
+
 </form>
 
 @section Scripts {
