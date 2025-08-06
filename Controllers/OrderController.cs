@@ -16,17 +16,23 @@ public class OrderController : Controller
     private readonly ApplicationDbContext _context;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IHubContext<OrderHub> _hubContext;
-
-    public OrderController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IHubContext<OrderHub> hubContext)
+public OrderController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IHubContext<OrderHub> hubContext)
     {
         _context = context;
         _userManager = userManager;
         _hubContext = hubContext;
     }
 
+    private void SetCategoryCount()
+    {
+        ViewBag.CategoryCount = _context.Categories.Count();
+    }
+
     [HttpGet]
     public IActionResult Checkout()
     {
+        SetCategoryCount();
+
         var cart = HttpContext.Session.GetObject<List<CartItem>>("cart");
         if (cart == null || !cart.Any())
         {
@@ -41,6 +47,8 @@ public class OrderController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Checkout(CheckoutViewModel model)
     {
+        SetCategoryCount();
+
         if (!ModelState.IsValid)
         {
             return View(model);
@@ -87,6 +95,8 @@ public class OrderController : Controller
 
     public IActionResult MyOrders()
     {
+        SetCategoryCount();
+
         var userId = _userManager.GetUserId(User);
         var orders = _context.Orders
             .Include(o => o.Items)
@@ -100,6 +110,8 @@ public class OrderController : Controller
 
     public IActionResult Confirmation(int orderId)
     {
+        SetCategoryCount();
+
         var order = _context.Orders
             .Include(o => o.Items)
             .ThenInclude(i => i.Product)
@@ -123,4 +135,5 @@ public class OrderController : Controller
 
         return View(model);
     }
+
 }
