@@ -34,12 +34,16 @@
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
 
+    ```
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-danger">
-            <i class="bi bi-trash"></i> Delete
+            <i class="bi bi-trash"></i> Delete Product
         </button>
         <a asp-action="All" class="btn btn-secondary">
-            Cancel
+            <i class="bi bi-x-circle"></i> Cancel
         </a>
     </div>
+
+    ```
+
 </form>
