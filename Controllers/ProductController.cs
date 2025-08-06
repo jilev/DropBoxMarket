@@ -8,15 +8,23 @@ public class ProductController : Controller
 {
     private readonly ApplicationDbContext _context;
 
-    public ProductController(ApplicationDbContext context)
+```
+public ProductController(ApplicationDbContext context)
     {
         _context = context;
+    }
+
+    private void SetCategoryCount()
+    {
+        ViewBag.CategoryCount = _context.Categories.Count();
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Edit(Product product, IFormFile imageFile)
     {
+        SetCategoryCount();
+
         if (!ModelState.IsValid)
         {
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
@@ -56,6 +64,8 @@ public class ProductController : Controller
 
     public IActionResult Delete(int id)
     {
+        SetCategoryCount();
+
         var product = _context.Products
             .Include(p => p.Category)
             .FirstOrDefault(p => p.Id == id);
@@ -64,11 +74,11 @@ public class ProductController : Controller
             return NotFound();
 
         ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
-        {
-            ("Home", Url.Action("Index", "Home")),
-            ("Products", Url.Action("All", "Product")),
-            ("Delete", null)
-        };
+    {
+        ("Home", Url.Action("Index", "Home")),
+        ("Products", Url.Action("All", "Product")),
+        ("Delete", null)
+    };
 
         return View(product);
     }
@@ -77,6 +87,8 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult DeleteConfirmed(int id)
     {
+        SetCategoryCount();
+
         var product = _context.Products.Find(id);
         if (product == null)
             return NotFound();
@@ -99,11 +111,13 @@ public class ProductController : Controller
 
     public IActionResult All(int? categoryId, string searchTerm, int page = 1)
     {
+        SetCategoryCount();
+
         ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
-        {
-            ("Home", Url.Action("Index", "Home")),
-            ("Products", null)
-        };
+    {
+        ("Home", Url.Action("Index", "Home")),
+        ("Products", null)
+    };
 
         int pageSize = 6;
 
@@ -149,15 +163,17 @@ public class ProductController : Controller
 
     public IActionResult Edit(int id)
     {
+        SetCategoryCount();
+
         var product = _context.Products.Find(id);
         if (product == null) return NotFound();
 
         ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
-        {
-            ("Home", Url.Action("Index", "Home")),
-            ("Products", Url.Action("All", "Product")),
-            ("Edit", null)
-        };
+    {
+        ("Home", Url.Action("Index", "Home")),
+        ("Products", Url.Action("All", "Product")),
+        ("Edit", null)
+    };
 
         ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
         return View(product);
@@ -165,6 +181,8 @@ public class ProductController : Controller
 
     public IActionResult Details(int id)
     {
+        SetCategoryCount();
+
         var product = _context.Products
             .Include(p => p.Category)
             .FirstOrDefault(p => p.Id == id);
@@ -173,12 +191,15 @@ public class ProductController : Controller
             return NotFound();
 
         ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
-        {
-            ("Home", Url.Action("Index", "Home")),
-            ("Products", Url.Action("All", "Product")),
-            (product.Title, null)
-        };
+    {
+        ("Home", Url.Action("Index", "Home")),
+        ("Products", Url.Action("All", "Product")),
+        (product.Title, null)
+    };
 
         return View(product);
     }
+
+```
+
 }
