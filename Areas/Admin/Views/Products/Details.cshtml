@@ -1,34 +1,25 @@
 ﻿@model DropBoxMarket.Models.Product
 @{
-    ViewData["Title"] = "Product Details";
-    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+	ViewData["Title"] = "Product Details";
+	Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 <h2>Product Details</h2>
-
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">Title</dt>
-        <dd class="col-sm-10">@Model.Title</dd>
-
-        <dt class="col-sm-2">Description</dt>
-        <dd class="col-sm-10">@Model.Description</dd>
-
-        <dt class="col-sm-2">Price</dt>
-        <dd class="col-sm-10">@Model.Price.ToString("C")</dd>
-
-        <dt class="col-sm-2">Category</dt>
-        <dd class="col-sm-10">@Model.Category?.Name</dd>
-
-        <dt class="col-sm-2">Image</dt>
-        <dd class="col-sm-10">
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <img src="@Model.ImageUrl" style="max-width:200px;" class="img-thumbnail" />
-            }
-        </dd>
-    </dl>
+<div class="card p-3">
+	<div class="row">
+		<div class="col-md-4">
+			@if (!string.IsNullOrEmpty(Model.ImageUrl))
+			{
+				<img src="@Model.ImageUrl" class="img-fluid rounded" />
+			}
+		</div>
+		<div class="col-md-8">
+			<h4>@Model.Title</h4>
+			<p>@Model.Description</p>
+			<p><strong>Price:</strong> @Model.Price.ToString("C")</p>
+			<p><strong>Category:</strong> @Model.Category?.Name</p>
+			<a asp-area="Admin" asp-controller="Products" asp-action="Index" class="btn btn-secondary">Back</a>
+			<a asp-area="Admin" asp-controller="Products" asp-action="Edit" [asp-route-id="@Model.Id](mailto:asp-route-id=%22@Model.Id)" class="btn btn-primary">Edit</a>
+		</div>
+	</div>
 </div>
-
-<a asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-<a asp-area="Admin" asp-controller="Products" asp-action="Index" class="btn btn-secondary">Back to List</a>

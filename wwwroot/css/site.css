@@ -23,3 +23,5 @@ body {
 .test-border {
     border: 1px solid red;
 }
+.card {border-radius; 1rem;}
+.card img {border-top-left-radius: 1rem; border-top-right-radius: 1rem; }

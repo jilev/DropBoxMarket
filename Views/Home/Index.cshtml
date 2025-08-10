@@ -1,8 +1,120 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model DropBoxMarket.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Welcome";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    .hero {
+        background: radial-gradient(1200px 600px at 10% 10%, rgba(13,110,253,.15), transparent), radial-gradient(1000px 500px at 90% 20%, rgba(25,135,84,.15), transparent), linear-gradient(180deg, #0d6efd0f, transparent);
+        border-radius: 1rem;
+    }
+</style>
+
+<section class="hero p-5 mb-4 shadow-sm">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <h1 class="display-5 fw-bold">Find your next favorite item</h1>
+            <p class="lead text-muted">
+                Browse @Model.TotalProducts products across @Model.TotalCategories categories.
+                @if (User.Identity?.IsAuthenticated == true && Model.TotalOrdersForUser > 0)
+                {
+                    <span class="d-block mt-1">You have <strong>@Model.TotalOrdersForUser</strong> orders so far.</span>
+                }
+            </p>
+
+            <form method="get" asp-controller="Product" asp-action="All" class="row g-2 mt-3">
+                <div class="col-sm-8 col-md-9">
+                    <input name="searchTerm" value="@Model.SearchTerm" class="form-control form-control-lg"
+                           placeholder="Search for products…" />
+                </div>
+                <div class="col-sm-4 col-md-3 d-grid">
+                    <button class="btn btn-primary btn-lg" type="submit">Search</button>
+                </div>
+            </form>
+
+            <div class="mt-3">
+                <a class="btn btn-outline-secondary btn-sm" asp-controller="Product" asp-action="All">Browse all products</a>
+                @if (User.IsInRole("Administrator"))
+                {
+                    <a class="btn btn-outline-dark btn-sm ms-2" asp-area="Admin" asp-controller="Products" asp-action="Index">Admin panel</a>
+                }
+            </div>
+        </div>
+        <div class="col-lg-5 text-center">
+            <img src="https://dummyimage.com/520x320/e9ecef/6c757d&text=DropBoxMarket"
+                 class="img-fluid rounded shadow-sm" alt="Hero" />
+        </div>
+    </div>
+</section>
+
+@if (Model.TopCategories.Any())
+{
+    <section class="mb-4">
+        <h4 class="mb-3">Top categories</h4>
+        <div class="d-flex flex-wrap gap-2">
+            @foreach (var c in Model.TopCategories)
+            {
+                <a asp-controller="Product" asp-action="All" asp-route-categoryId="@c.Id"
+                   class="badge rounded-pill bg-light text-dark border px-3 py-2 text-decoration-none">
+                    @c.Name <span class="ms-1 text-muted">(@c.ProductCount)</span>
+                </a>
+            }
+        </div>
+    </section>
+}
+
+<section class="mb-2 d-flex align-items-center justify-content-between">
+    <h4 class="m-0">Featured products</h4>
+    <a class="link-primary" asp-controller="Product" asp-action="All">View all</a>
+</section>
+
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    @foreach (var p in Model.FeaturedProducts)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                @if (!string.IsNullOrEmpty(p.ImageUrl))
+                {
+                    <img src="@p.ImageUrl" class="card-img-top" style="object-fit:cover;height:190px" alt="@p.Title" />
+                }
+                else
+                {
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height:190px">
+                        <span class="text-muted">No image</span>
+                    </div>
+                }
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title mb-1">@p.Title</h6>
+                    <small class="text-muted mb-2">@p.Category?.Name</small>
+                    <div class="mt-auto d-flex align-items-center justify-content-between">
+                        <span class="fw-semibold">@p.Price.ToString("C")</span>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Product" asp-action="Details" asp-route-id="@p.Id">Details</a>
+                            <form method="post" asp-controller="Cart" asp-action="AddToCart">
+                                <input type="hidden" name="productId" value="@p.Id" />
+                                <button class="btn btn-sm btn-primary" type="submit">Add</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+<section class="mt-5 p-4 border rounded-3 bg-light">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <h6 class="fw-bold mb-1">Fast checkout</h6>
+            <p class="text-muted mb-0">Simple cart and quick order confirmation.</p>
+        </div>
+        <div class="col-md-4">
+            <h6 class="fw-bold mb-1">Secure</h6>
+            <p class="text-muted mb-0">Identity, roles, CSRF and validation in place.</p>
+        </div>
+        <div class="col-md-4">
+            <h6 class="fw-bold mb-1">Real-time notifications</h6>
+            <p class="text-muted mb-0">Admins get instant order pings via SignalR.</p>
+        </div>
+    </div>
+</section>

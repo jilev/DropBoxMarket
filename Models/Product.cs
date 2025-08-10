@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -24,7 +25,7 @@ namespace DropBoxMarket.Models
 
         [Required(ErrorMessage = "Category is required")]
         public int CategoryId { get; set; }
-
-        public Category Category { get; set; } = null!;
+        [ValidateNever]
+        public Category? Category { get; set; }
     }
 }
