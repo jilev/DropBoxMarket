@@ -3,191 +3,55 @@ using DropBoxMarket.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
+[Authorize] 
 public class ProductController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IProductService _products;
+    private readonly ApplicationDbContext _db; 
 
-
-public ProductController(ApplicationDbContext context)
+public ProductController(IProductService products, ApplicationDbContext db)
     {
-        _context = context;
+        _products = products;
+        _db = db;
     }
 
-    private void SetCategoryCount()
-    {
-        ViewBag.CategoryCount = _context.Categories.Count();
-    }
+    private async Task SetCategoryCountAsync()
+        => ViewBag.CategoryCount = await _products.CountCategoriesAsync();
 
-    [HttpGet]
-    [Authorize(Roles = "Administrator")]
-    public IActionResult Edit(int id)
-    {
-        SetCategoryCount();
-
-        var product = _context.Products.Find(id);
-        if (product == null) return NotFound();
-
-        ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
-    {
-        ("Home", Url.Action("Index", "Home")),
-        ("Products", Url.Action("All", "Product")),
-        ("Edit", null)
-    };
-
-        ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-        return View(product);
-    }
-
-    [HttpPost]
-    [Authorize(Roles = "Administrator")]
-    [ValidateAntiForgeryToken]
-    public IActionResult Edit([Bind("Id,Title,Description,Price,CategoryId")] Product product, IFormFile? imageFile)
-    {
-        SetCategoryCount();
-
-        if (!ModelState.IsValid)
-        {
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
-        }
-
-        var existingProduct = _context.Products.FirstOrDefault(p => p.Id == product.Id);
-        if (existingProduct == null) return NotFound();
-
-        existingProduct.Title = product.Title;
-        existingProduct.Description = product.Description;
-        existingProduct.Price = product.Price;
-        existingProduct.CategoryId = product.CategoryId;
-
-        if (imageFile != null && imageFile.Length > 0)
-        {
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-
-            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using var stream = new FileStream(filePath, FileMode.Create);
-            imageFile.CopyTo(stream);
-
-            existingProduct.ImageUrl = "/images/" + uniqueFileName;
-        }
-
-        _context.SaveChanges();
-        TempData["Message"] = "Product updated successfully!";
-        return RedirectToAction(nameof(All));
-    }
-
-    [HttpGet]
-    [Authorize(Roles = "Administrator")]
-    public IActionResult Delete(int id)
-    {
-        SetCategoryCount();
-
-        var product = _context.Products
-            .Include(p => p.Category)
-            .FirstOrDefault(p => p.Id == id);
-
-        if (product == null) return NotFound();
-
-        ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
-    {
-        ("Home", Url.Action("Index", "Home")),
-        ("Products", Url.Action("All", "Product")),
-        ("Delete", null)
-    };
-
-        return View(product);
-    }
-
-    [HttpPost, ActionName("Delete")]
-    [Authorize(Roles = "Administrator")]
-    [ValidateAntiForgeryToken]
-    public IActionResult DeleteConfirmed(int id)
-    {
-        SetCategoryCount();
-
-        var product = _context.Products.Find(id);
-        if (product == null) return NotFound();
-
-        if (!string.IsNullOrEmpty(product.ImageUrl))
-        {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", product.ImageUrl.TrimStart('/'));
-            if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
-        }
-
-        _context.Products.Remove(product);
-        _context.SaveChanges();
-
-        TempData["Message"] = "Product deleted successfully!";
-        return RedirectToAction(nameof(All));
-    }
-
-    [HttpGet]
     [AllowAnonymous]
-    public IActionResult All(int? categoryId, string? searchTerm, int page = 1)
+    public async Task<IActionResult> All(int? categoryId, string? searchTerm, int page = 1)
     {
-        SetCategoryCount();
+        await SetCategoryCountAsync();
 
-        ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
+        ViewData["Breadcrumbs"] = new List<(string, string?)>
     {
         ("Home", Url.Action("Index", "Home")),
         ("Products", null)
     };
 
         const int pageSize = 6;
+        var (items, total) = await _products.GetAllAsync(categoryId, searchTerm, page, pageSize);
 
-        var productsQuery = _context.Products
-            .Include(p => p.Category)
-            .AsQueryable();
-
-        if (categoryId.HasValue)
-            productsQuery = productsQuery.Where(p => p.CategoryId == categoryId.Value);
-
-        if (!string.IsNullOrWhiteSpace(searchTerm))
-            productsQuery = productsQuery.Where(p =>
-                p.Title.Contains(searchTerm) || p.Description.Contains(searchTerm));
-
-        ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+        ViewBag.Categories = new SelectList(_db.Categories, "Id", "Name");
         ViewBag.SelectedCategory = categoryId;
         ViewBag.SearchTerm = searchTerm;
-
-        int totalItems = productsQuery.Count();
-        var products = productsQuery
-            .OrderBy(p => p.Id)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
-
-        var recommendedProducts = _context.Products
-            .Include(p => p.Category)
-            .Where(p => !products.Select(x => x.Id).Contains(p.Id))
-            .OrderBy(_ => Guid.NewGuid())
-            .Take(4)
-            .ToList();
-
         ViewBag.CurrentPage = page;
-        ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-        ViewBag.RecommendedProducts = recommendedProducts;
+        ViewBag.TotalPages = (int)Math.Ceiling(total / (double)pageSize);
+        ViewBag.RecommendedProducts = await _products.GetRecommendedAsync(items.Select(x => x.Id), 4);
 
-        return View(products);
+        return View(items);
     }
 
-    [HttpGet]
     [AllowAnonymous]
-    public IActionResult Details(int id)
+    public async Task<IActionResult> Details(int id)
     {
-        SetCategoryCount();
+        await SetCategoryCountAsync();
 
-        var product = _context.Products
-            .Include(p => p.Category)
-            .FirstOrDefault(p => p.Id == id);
+        var product = await _products.GetByIdAsync(id, includeCategory: true);
+        if (product is null) return NotFound();
 
-        if (product == null) return NotFound();
-
-        ViewData["Breadcrumbs"] = new List<(string Text, string Url)>
+        ViewData["Breadcrumbs"] = new List<(string, string?)>
     {
         ("Home", Url.Action("Index", "Home")),
         ("Products", Url.Action("All", "Product")),
@@ -196,5 +60,98 @@ public ProductController(ApplicationDbContext context)
 
         return View(product);
     }
+
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> Edit(int id)
+    {
+        await SetCategoryCountAsync();
+
+        var product = await _products.GetByIdAsync(id);
+        if (product is null) return NotFound();
+
+        ViewBag.Categories = new SelectList(_db.Categories, "Id", "Name", product.CategoryId);
+        ViewData["Breadcrumbs"] = new List<(string, string?)>
+    {
+        ("Home", Url.Action("Index", "Home")),
+        ("Products", Url.Action("All", "Product")),
+        ("Edit", null)
+    };
+        return View(product);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> Edit(Product product, IFormFile? imageFile)
+    {
+        await SetCategoryCountAsync();
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Categories = new SelectList(_db.Categories, "Id", "Name", product.CategoryId);
+            return View(product);
+        }
+
+        var ok = await _products.UpdateAsync(product, imageFile);
+        if (!ok) return NotFound();
+
+        TempData["Message"] = "Product updated successfully!";
+        return RedirectToAction(nameof(All));
+    }
+
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> Create()
+    {
+        await SetCategoryCountAsync();
+        ViewBag.Categories = new SelectList(_db.Categories, "Id", "Name");
+        return View(new Product());
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> Create(Product product, IFormFile? imageFile)
+    {
+        await SetCategoryCountAsync();
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Categories = new SelectList(_db.Categories, "Id", "Name", product.CategoryId);
+            return View(product);
+        }
+
+        await _products.CreateAsync(product, imageFile);
+        TempData["Message"] = "Product created!";
+        return RedirectToAction(nameof(All));
+    }
+
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await SetCategoryCountAsync();
+
+        var product = await _products.GetByIdAsync(id, includeCategory: true);
+        if (product is null) return NotFound();
+
+        ViewData["Breadcrumbs"] = new List<(string, string?)>
+    {
+        ("Home", Url.Action("Index", "Home")),
+        ("Products", Url.Action("All", "Product")),
+        ("Delete", null)
+    };
+        return View(product);
+    }
+
+    [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        await SetCategoryCountAsync();
+
+        var ok = await _products.DeleteAsync(id);
+        if (!ok) return NotFound();
+
+        TempData["Message"] = "Product deleted successfully!";
+        return RedirectToAction(nameof(All));
+    }
+
 
 }

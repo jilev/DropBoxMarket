@@ -1,8 +1,8 @@
-﻿namespace DropBoxMarket.Tests;
-
+﻿using DropBoxMarket.Hubs;
+namespace DropBoxMarket.Tests;
 public class UnitTest1
 {
-    [Fact]
+    
     public void Test1()
     {
 

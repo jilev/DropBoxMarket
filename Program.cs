@@ -19,6 +19,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
 builder.Services.AddSignalR();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 
 var app = builder.Build();
