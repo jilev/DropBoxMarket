@@ -1,4 +1,6 @@
 ﻿using DropBoxMarket.Data;
+using DropBoxMarket.Services;
+using DropBoxMarket.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +22,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 
 var app = builder.Build();
