@@ -5,7 +5,7 @@ VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DropBoxMarket", "DropBoxMarket.csproj", "{6FC47FE2-C610-4847-868A-68F095A14DF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DropBoxMarket.Tests", "..\DropBoxMarket.Tests\DropBoxMarket.Tests.csproj", "{2A9D5FA7-9B4C-453F-A0FF-C8582F931178}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DropBoxMarket.Tests", "..\..\..\source\repos\DropBoxMarket.Tests\DropBoxMarket.Tests\DropBoxMarket.Tests.csproj", "{5D30106B-D6C4-9704-EE65-3EB3BA52A605}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{6FC47FE2-C610-4847-868A-68F095A14DF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FC47FE2-C610-4847-868A-68F095A14DF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FC47FE2-C610-4847-868A-68F095A14DF6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2A9D5FA7-9B4C-453F-A0FF-C8582F931178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2A9D5FA7-9B4C-453F-A0FF-C8582F931178}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2A9D5FA7-9B4C-453F-A0FF-C8582F931178}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2A9D5FA7-9B4C-453F-A0FF-C8582F931178}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D30106B-D6C4-9704-EE65-3EB3BA52A605}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D30106B-D6C4-9704-EE65-3EB3BA52A605}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D30106B-D6C4-9704-EE65-3EB3BA52A605}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D30106B-D6C4-9704-EE65-3EB3BA52A605}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
